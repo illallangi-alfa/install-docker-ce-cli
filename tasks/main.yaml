@@ -1,0 +1,17 @@
+---
+- name: "Fail if OS/Architecture is not supported"
+  fail:
+    msg: "Installing docker-ce-cli on {{ (ansible_os_family | lower) + '_' + (ansible_architecture | lower) }} is unsupported."
+  when:
+    - "(install_docker_ce_cli_packages | default({}))[(ansible_os_family | lower) + '_' + (ansible_architecture | lower)] is not defined"
+    - "docker_ce_cli is defined"
+  tags:
+    - "docker-ce-cli"
+- name: "Install docker-ce-cli"
+  package:
+    pkg: "{{ install_docker_ce_cli_packages[(ansible_os_family | lower) + '_' + (ansible_architecture | lower)] }}"
+    state: "present"
+  when:
+    - "docker_ce_cli is defined"
+  tags:
+    - "docker-ce-cli"
