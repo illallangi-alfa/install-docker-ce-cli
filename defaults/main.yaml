@@ -1,12 +1,10 @@
 ---
 install_docker_ce_cli_packages:
-  redhat: &redhat
-    - name: "docker-ce-cli-19.03.4"
-      hold: true
   raspbian: &raspbian
     - name: "docker-ce-cli=5:19.03.4~3-0~raspbian-buster"
       hold: true
+  debian: &debian
+    - name: "docker-ce-cli=5:19.03.4~3-0~debian-buster"
+      hold: true
   debian_armv7l: *raspbian
-  redhat_x86_64: *redhat
-dnf_exclude_docker_ce_cli:
-  - "docker-ce-cli"
+  debian_x86_64: *debian

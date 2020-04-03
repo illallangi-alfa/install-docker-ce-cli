@@ -1,33 +1,10 @@
 ---
-- name: "Install docker-ce-cli (redhat)"
-  dnf:
-    pkg: "{{ install_docker_ce_cli_packages[(ansible_os_family | lower) + '_' + (ansible_architecture | lower)] | json_query('[].name')}}"
-    state: "present"
-    disable_excludes: "all"
-  register: installed_docker_ce_cli_packages
-  when:
-    - "(ansible_os_family | lower) == 'redhat'"
-  tags:
-    - "docker-ce-cli"
-- name: "Pin docker-ce-cli (redhat)"
-  vars:
-    jmespath: "[{% for var in (lookup('varnames', '^dnf_exclude_.+').split(',')) %}{{ var }}{{ ',' if not loop.last else '' }}{% endfor %}][]"
-  lineinfile:
-    state: "present"
-    path: "/etc/dnf/dnf.conf"
-    line: "excludepkgs={{ vars | to_json | from_json | json_query(jmespath) | unique | sort | join(',') }}"
-  when:
-    - "(ansible_os_family | lower) == 'redhat'"
-  tags:
-    - "docker-ce-cli"
 - name: "Install docker-ce-cli (debian)"
   apt:
     pkg: "{{ install_docker_ce_cli_packages[(ansible_os_family | lower) + '_' + (ansible_architecture | lower)] | json_query('[].name')}}"
     update_cache: yes
     install_recommends: no
   register: installed_docker_ce_cli_packages
-  when:
-    - "(ansible_os_family | lower) == 'debian'"
   tags:
     - "docker-ce-cli"
 - name: "Pin docker-ce-cli (debian)"
@@ -37,7 +14,6 @@
     apt-mark hold {{ item }}
   with_items: "{{ install_docker_ce_cli_packages[(ansible_os_family | lower) + '_' + (ansible_architecture | lower)] | json_query('[?hold==`true`].name')}}"
   when:
-    - "(ansible_os_family | lower) == 'debian'"
     - "installed_docker_ce_cli_packages.changed"
   tags:
     - "docker-ce-cli"
